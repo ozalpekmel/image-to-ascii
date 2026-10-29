@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+
+<!--
+MIT License
+
+Copyright (c) 2026 Ekmel Özalp
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to ASCII Vector Studio</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #0d0e12;
+            color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .card {
+            background: #161822;
+            border: 1px solid #282c3f;
+            border-radius: 12px;
+            padding: 16px;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 200px;
+        }
+        .input-group label {
+            font-size: 0.75rem;
+            color: #8a94a6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input[type="text"] {
+            background: #0d0e12;
+            border: 1px solid #2b3045;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus {
+            border-color: #6366f1;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .btn-file {
+            background: #222636;
+            border: 1px dashed #3f4663;
+            color: #c5cbe3;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 41px;
+        }
+        .btn-file:hover {
+            background: #2b3045;
+            border-color: #6366f1;
+            color: #fff;
+        }
+        .btn-file.active {
+            background: #1e293b;
+            border-color: #10b981;
+            color: #34d399;
+            border-style: solid;
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            height: 41px;
+            margin-top: auto;
+            transition: opacity 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+        .canvas-wrapper {
+            background: #000;
+            border: 1px solid #232736;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 300px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+        svg {
+            display: block;
+            max-width: 100%;
+            max-height: 75vh;
+            height: auto;
+        }
+        .download-btn {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            display: none;
+        }
+        .download-btn:hover { background: #059669; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Image to ASCII Vector</h1>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="input-group">
+                <label>Görsel Yükle</label>
+                <label for="upload" class="btn-file" id="fileLabel">📁 Görsel Seçin</label>
+                <input type="file" id="upload" accept="image/*">
+            </div>
+
+            <div class="input-group">
+                <label>Özel Metin</label>
+                <input type="text" id="customText" value="" placeholder="Metninizi yazın...">
+            </div>
+
+            <button class="btn-submit" onclick="generateVectorArt()">Vektörel Oluştur</button>
+        </div>
+
+        <div class="canvas-wrapper" id="wrapper">
+            <svg id="svgOutput" viewBox="0 0 800 800" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" fill="#000"/>
+            </svg>
+        </div>
+        <button id="dlBtn" class="download-btn" onclick="downloadSVG()">📥 Vektör Olarak İndir (SVG)</button>
+    </div>
+
+    <script>
+        const upload = document.getElementById('upload');
+        const fileLabel = document.getElementById('fileLabel');
+        const customTextInput = document.getElementById('customText');
+        const svgContainer = document.getElementById('svgOutput');
+        const dlBtn = document.getElementById('dlBtn');
+        let loadedImage = new Image();
+        let isImageLoaded = false;
+        let generatedSvgString = "";
+
+        upload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                loadedImage.onload = () => {
+                    isImageLoaded = true;
+                    fileLabel.innerText = "✓ " + (file.name.length > 15 ? file.name.substring(0, 12) + "..." : file.name);
+                    fileLabel.classList.add("active");
+                };
+                loadedImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function generateVectorArt() {
+            if (!isImageLoaded) {
+                alert("Lütfen önce bir görsel yükleyin!");
+                return;
+            }
+            
+            let txt = customTextInput.value.trim();
+            if (!txt) txt = "NE MUTLU TÜRKÜM DİYENE "; 
+            if (!txt.endsWith(" ")) txt += " ";
+
+            // Detay kapasitesini artırmak için çözünürlük tabanı yükseltildi
+            const maxWidth = 1200;
+            const maxHeight = 1200;
+            let width = loadedImage.width;
+            let height = loadedImage.height;
+            
+            if (width > height) {
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width = Math.round((width * maxHeight) / height);
+                    height = maxHeight;
+                }
+            }
+            
+            const tempCvs = document.createElement('canvas');
+            tempCvs.width = width;
+            tempCvs.height = height;
+            const tCtx = tempCvs.getContext('2d');
+            tCtx.drawImage(loadedImage, 0, 0, width, height);
+            
+            let pixels;
+            try {
+                pixels = tCtx.getImageData(0, 0, width, height).data;
+            } catch (err) {
+                alert("Piksel okuma hatası!");
+                return;
+            }
+            
+            const cx = width / 2;
+            const cy = height / 2;
+            
+            let a = 0;
+            let b = 0.85; // Küçük harfler için spiral sıklığı sıkılaştırıldı
+            let theta = 0;
+            let txtIdx = 0;
+            
+            const maxTheta = (Math.sqrt(width * width + height * height)) / b;
+
+            let svgMarkup = `<svg viewBox="0 0 ${width} ${height}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="background:#000;">\n`;
+            svgMarkup += `<style>text { font-family: monospace; font-weight: bold; }</style>\n`;
+
+            let loopLimit = 0;
+            while (theta <= maxTheta && loopLimit < 120000) {
+                loopLimit++;
+                const r = a + b * theta;
+                const x = Math.floor(cx + r * Math.cos(theta));
+                const y = Math.floor(cy + r * Math.sin(theta));
+
+                if (x >= 0 && x < width && y >= 0 && y < height) {
+                    const idx = (y * width + x) * 4;
+                    let red = pixels[idx];
+                    let green = pixels[idx+1];
+                    let blue = pixels[idx+2];
+                    const brightness = (red + green + blue) / 3;
+
+                    if (brightness > 10) {
+                        const boost = Math.max(0, 35 - brightness);
+                        red = Math.min(255, red + boost);
+                        green = Math.min(255, green + boost);
+                        blue = Math.min(255, blue + boost);
+
+                        const char = txt[txtIdx % txt.length];
+                        const deg = (theta + Math.PI / 2) * (180 / Math.PI);
+
+                        // Harf boyutu 3.8px yapılarak yüksek detay ve netlik sağlandı
+                        svgMarkup += `  <text x="${x}" y="${y}" fill="rgb(${red},${green},${blue})" font-size="3.8" dominant-baseline="middle" text-anchor="middle" transform="rotate(${deg}, ${x}, ${y})">${char}</text>\n`;
+                        
+                        txtIdx++;
+                    }
+                }
+
+                const deltaTheta = 3.8 / (r + 1); 
+                theta += deltaTheta;
+            }
+
+            svgMarkup += `</svg>`;
+            generatedSvgString = svgMarkup;
+
+            svgContainer.outerHTML = svgMarkup;
+            dlBtn.style.display = "block";
+        }
+
+        function downloadSVG() {
+            if (!generatedSvgString) return;
+            const blob = new Blob([generatedSvgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'image-to-ascii-vector.svg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
