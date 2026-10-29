@@ -28,7 +28,7 @@ SOFTWARE.
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image to ASCII Vector Studio</title>
+    <title>Image to ASCII</title>
     <style>
         * {
             box-sizing: border-box;
@@ -251,8 +251,7 @@ SOFTWARE.
             let txt = customTextInput.value.trim();
             if (!txt) txt = "NE MUTLU TÜRKÜM DİYENE "; 
             if (!txt.endsWith(" ")) txt += " ";
-
-            // Detay kapasitesini artırmak için çözünürlük tabanı yükseltildi
+           
             const maxWidth = 1200;
             const maxHeight = 1200;
             let width = loadedImage.width;
@@ -288,7 +287,7 @@ SOFTWARE.
             const cy = height / 2;
             
             let a = 0;
-            let b = 0.85; // Küçük harfler için spiral sıklığı sıkılaştırıldı
+            let b = 0.85;
             let theta = 0;
             let txtIdx = 0;
             
@@ -320,7 +319,6 @@ SOFTWARE.
                         const char = txt[txtIdx % txt.length];
                         const deg = (theta + Math.PI / 2) * (180 / Math.PI);
 
-                        // Harf boyutu 3.8px yapılarak yüksek detay ve netlik sağlandı
                         svgMarkup += `  <text x="${x}" y="${y}" fill="rgb(${red},${green},${blue})" font-size="3.8" dominant-baseline="middle" text-anchor="middle" transform="rotate(${deg}, ${x}, ${y})">${char}</text>\n`;
                         
                         txtIdx++;
